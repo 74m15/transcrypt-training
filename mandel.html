@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Mandelbrot set</title>
+    <script src="__javascript__/mandel.js"></script>
+  </head>
+  <body onload="mandel.mandelbrot.startup()">
+    <h1>Mandelbrot set</h1>
+    <h2>Transcrypt training</h2>
+    <p/>
+    <div id="container">
+      <canvas id="mandelbrot" width="400" height="400"/>
+    </div>
+    <p>Width <input type="text" value="100" id="txt_width"/></p>
+    <p>Max iter <input type="text" value="50" id="txt_max_iter"/></p>
+    <button id="do_mandelbrot" onclick="mandel.mandelbrot.draw()">Draw!</button>
+  </body>
+</html>
