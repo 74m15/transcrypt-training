@@ -319,64 +319,76 @@ class Mandel:
     self.selector.style.height = "{}px".format(self.b - self.t + 1)
   
   
-  def on_mousedown(self, e):
-    if (e.target.id == "mandelbrot"):
+  def __selector_start_event(self, target, x, y):
+    if (target == "mandelbrot"):
       if (self.action is None):
-        self.place_selector(e.clientX, e.clientY)
+        self.place_selector(x, y)
     else:
       if (self.action == "select"):
-        if (self.baseX - 5 <= e.clientX <= self.baseX + 5 and self.baseY - 5 <= e.clientY <= self.baseY + 5):
+        if (self.baseX - 5 <= x <= self.baseX + 5 and self.baseY - 5 <= y <= self.baseY + 5):
           self.action = "moving"
-        elif (self.l <= e.clientX <= self.l + 10):
-          if (self.t <= e.clientY <= self.t + 10):
+        elif (self.l <= x <= self.l + 10):
+          if (self.t <= y <= self.t + 10):
             self.action = "resize-NW"
-          elif (self.b - 10 <= e.clientY <= self.b):
+          elif (self.b - 10 <= y <= self.b):
             self.action = "resize-SW"
-        elif (self.r - 10 <= e.clientX <= self.r):
-          if (self.t <= e.clientY <= self.t + 10):
+        elif (self.r - 10 <= x <= self.r):
+          if (self.t <= y <= self.t + 10):
             self.action = "resize-NE"
-          elif (self.b - 10 <= e.clientY <= self.b):
+          elif (self.b - 10 <= y <= self.b):
             self.action = "resize-SE"
   
   
-  def on_touchstart(self, e):
-    if (e.target.id == "mandelbrot"):
-      self.start_selection(e.targetTouches[0].clientX, e.targetTouches[0].clientY)
-      
-      return False
-  
-  
-  def on_mousemove(self, e):
+  def __selector_move_event(self, x, y):
     if (self.action is not None):
       if (self.action == "moving"):
-        self.move_selector(e.clientX, e.clientY)
+        self.move_selector(x, y)
         
         return False
       elif (self.action.startswith("resize-")):
-        self.resize_selector(self.action[-2:], e.clientX, e.clientY)
+        self.resize_selector(self.action[-2:], x, y)
         
         return False
   
   
-  def on_touchmove(self, e):
-    if (self.resizing == 1):
-      self.modify_selection(e.targetTouches[0].clientX, e.targetTouches[0].clientY)
-      
-      return False
-  
-  
-  def on_mouseup(self, e):
+  def __selector_end_event(self):
     if (self.action is not None and (self.action == "moving" or self.action.startsWith("resize-"))):
       self.action = "select"
       
       return False
   
   
-  def on_touchend(self, e):
-    if (self.resizing == 1):
-      self.resizing = 0
-      
+  def on_mousedown(self, e):
+    self.__selector_start_event(e.target.id, e.clientX, e.clientY)
+  
+  
+  def on_touchstart(self, e):
+    self.__selector_start_event(e.target.id, e.targetTouches[0].clientX, e.targetTouches[0].clientY)
+  
+  
+  def on_mousemove(self, e):
+    ret = self.__selector_move_event(e.clientX, e.clientY)
+    
+    if (ret is False):
       return False
+  
+  
+  def on_touchmove(self, e):
+    ret = self.__selector_move_event(e.targetTouches[0].clientX, e.targetTouches[0].clientY)
+    
+    if (ret is False):
+      return False
+  
+  
+  def on_mouseup(self, e):
+    ret = self.__selector_end_event()
+    
+    if (ret is False):
+      return False
+  
+  
+  def on_touchend(self, e):
+    self.on_mouseup(e)
 
 
 mandelbrot = Mandel()
