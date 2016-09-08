@@ -41,7 +41,7 @@ class Mandel:
     
     self.resizing = 0
     self.action = None
-    self.worker = __new__(Worker("../worker.js"))
+    self.worker = __new__(Worker("__javascript__/sample_worker.js"))
     self.worker.onmessage = self.on_message
 
     self.reset()
@@ -68,9 +68,9 @@ class Mandel:
     if (c == 0):
       return (0,0,0)
     
-    r = int(255 * (1 + cos(log(c))) / 2)
-    g = int(255 * (1 + cos(log(2 * c))) / 2)
-    b = int(255 * (1 + cos(log(3 * c) + pi / 4)) / 2)
+    r = int(255 * (1 + cos(sqrt(sqrt(c)))) / 2)
+    g = int(255 * (1 + cos(sqrt(sqrt(2 * c)))) / 2)
+    b = int(255 * (1 + cos(sqrt(sqrt(3 * c) + pi / 4))) / 2)
     
     return (r, g, b)
   
