@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<!--html manifest="cache.manifest"-->
+<html>
+  <head>
+    <title>Mandelbrot set</title>
+    <style>
+      body { margin: 0px; }
+
+      span#selector {
+        background-color: #a0a0a0;
+        opacity: 0.6;
+        border: 1px solid gray;
+        position: absolute;
+        display: flex;
+      }
+
+      div#container {
+        margin: 0px;
+        position: absolute;
+        display: flex;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+      }
+
+      div#control {
+        background-color: white;
+        opacity: 0.5;
+        margin: 0px;
+        position: absolute;
+        display: flex;
+        top: 0px;
+        align: right;
+      }
+    </style>
+    <script src="__javascript__/mandel.js"></script>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Mandelbrot">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="apple-touch-icon" href="mandel.png">
+  </head>
+  <body onload="mandel.mandelbrot.startup(); mandel.mandelbrot.draw();">
+    <div id="container">
+      <canvas id="mandelbrot"></canvas>
+      <span id="selector" style="left: 0px; top: 0px; width: 50px; height: 50px; visibility: hidden;">
+        <table width="100%" height="100%" style="border-collapse: collapse; border: 0px solid white;">
+          <tr>
+            <td style="background-color: white; width: 6px; height: 6px; cursor: nwse-resize;"/>
+            <td colspan="3"/>
+            <td style="background-color: white; width: 6px; height: 6px; cursor: nesw-resize;"/>
+          </tr>
+          <tr>
+            <td colspan="5"/>
+          </tr>
+          <tr>
+            <td colspan="2"/>
+            <td style="background-color: white; width: 6px; height: 6px; cursor: move;"/>
+            <td colspan="2"/>
+          </tr>
+          <tr>
+            <td colspan="5"/>
+          </tr>
+          <tr>
+            <td style="background-color: white; width: 6px; height: 6px; cursor: nesw-resize;"/>
+            <td colspan="3"/>
+            <td style="background-color: white; width: 6px; height: 6px; cursor: nwse-resize;"/>
+          </tr>
+        </table>
+      </span>
+    </div>
+    <div id="control">
+      <div>
+        <p>Step <input type="range" value="4" id="txt_width" min="1" max="4"/></p>
+        <p>Max iter <input type="range" value="8" id="txt_max_iter" min="5" max="24"/></p>
+        <p>&nbsp;</p>
+        <button onclick="mandel.mandelbrot.draw()">Draw</button>
+        <button onclick="mandel.mandelbrot.reset()">Reset</button>
+        <p>&nbsp;</p>
+        <table width="200px" style="margin: 2px; border: 1px solid blue; background-color: white;">
+          <tr height="20px" align="left">
+            <td style="background-color: white; margin: 0px; width: 1px;"/>
+            <td id="progress-bar" style="background-color: blue; width: 100%; margin: 0px;"/>
+            <td style="background-color: white; margin: 0px;"/>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

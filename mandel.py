@@ -6,7 +6,6 @@ __pragma__ ('skip')
 document = window = Math = Date = Worker = 0 # Prevent complaints by optional static checker
 __pragma__ ('noskip')
 
-
 def rgb(r, g, b):
   
   def _hex(x):
@@ -14,6 +13,7 @@ def rgb(r, g, b):
     
     res = [ "0", "0" ]
     
+
     for i in range(2):
       x, r = x // 16, x % 16
       
@@ -30,10 +30,16 @@ class Mandel:
   
   
   def reset(self):
-    self.mandel_left = -2.0
-    self.mandel_top = 1.25
-    self.mandel_right = 0.5
-    self.mandel_bottom = -1.25
+    if (self.canvas.width <= self.canvas.height):
+      self.mandel_left = -2
+      self.mandel_top = 2.5 * (self.canvas.height / self.canvas.width) / 2
+      self.mandel_right = 0.5
+      self.mandel_bottom = -self.mandel_top
+    else:
+      self.mandel_left =  -(2.5 * (self.canvas.width / self.canvas.height)) * (3/5)
+      self.mandel_top = 1.25
+      self.mandel_right = (2.5 * (self.canvas.width / self.canvas.height)) * (2/5)
+      self.mandel_bottom = -1.25
   
   
   def startup(self):
@@ -44,12 +50,17 @@ class Mandel:
     self.worker = __new__(Worker("__javascript__/sample_worker.js"))
     self.worker.onmessage = self.on_message
 
-    self.reset()
-    
     self.selector = document.getElementById("selector")
+    self.container = document.getElementById("container")
     self.canvas = document.getElementById("mandelbrot")
+    self.canvas.width = self.container.offsetWidth
+    self.canvas.height = self.container.offsetHeight
+    self.canvas.style.width = "{}px".format(self.canvas.width)
+    self.canvas.style.height = "{}px".format(self.canvas.height)
     self.ctx = self.canvas.getContext("2d")
 
+    self.reset()
+    
     document.getElementById("container").onmousedown = self.on_mousedown
     document.getElementById("container").onmousemove = self.on_mousemove
     document.getElementById("container").onmouseup = self.on_mouseup
@@ -76,7 +87,7 @@ class Mandel:
   
   
   def updateProgress(self):
-      progress = int(100 * (8/15) * (self.rows_done + 1) / self.width)
+      progress = int(100 * (8/15) * (self.rows_done + 1) / self.canvas.height * self.ratio)
       
       document.getElementById("progress-bar").style.width = "{}%".format(progress)
   
@@ -95,9 +106,8 @@ class Mandel:
   def draw(self):
     self.action = None
     
-    self.width = int(document.getElementById("txt_width").value)
-    self.ratio = min(self.canvas.width, self.canvas.height) / self.width
-    self.max_iter = int(document.getElementById("txt_max_iter").value)
+    self.ratio = int(document.getElementById("txt_width").value)
+    self.max_iter = 1 << int(document.getElementById("txt_max_iter").value)
     
     if (self.selector.style.visibility == "visible"):
       self.define_selection()
@@ -112,61 +122,33 @@ class Mandel:
     
     self.worker.postMessage({
       "cmd":'start', 
-      "width":self.width, 
+      "width":int(self.canvas.width / self.ratio), 
+      "height":int(self.canvas.height / self.ratio),
       "max_iter":self.max_iter,
       "left":self.mandel_left,
       "top":self.mandel_top,
       "right":self.mandel_right,
       "bottom":self.mandel_bottom})
     
-  
-  def start_selection(self, x, y):
-    self.resizing = 1
-    self.baseX = x
-    self.baseY = y
-    
-    self.l, self.t, self.r, self.b = x, y, x + 29, y + 29
-    
-    self.selector.style.visibility = "visible"
-    self.selector.style.left = "{}px".format(x)
-    self.selector.style.top = "{}px".format(y)
-    self.selector.style.width = "30px"
-    self.selector.style.height = "30px"
-  
-  
-  def adjustBox(self, bX, bY, eX, eY):
-      deltaX = bX - eX + 1
-      deltaY = bY - eY + 1
-      delta = max(30, abs(deltaX), abs(deltaY))
-      
-      if (deltaX > 0):
-        left = bX - delta
-      else:
-        left = bX
-      
-      if (deltaY > 0):
-        top = bY - delta
-      else:
-        top = bY
-
-      return (left, top, left + delta - 1, top + delta - 1)
-  
-  
-  def modify_selection(self, x, y):
-    self.l, self.t, self.r, self.b = self.adjustBox(self.baseX, self.baseY, x, y)
-    
-    self.selector.style.left = "{}px".format(self.l)
-    self.selector.style.top = "{}px".format(self.t)
-    self.selector.style.width = "{}px".format(self.r - self.l + 1)
-    self.selector.style.height = "{}px".format(self.b - self.t + 1)
-  
-  
   def define_selection(self):
+    deltaX = self.mandel_right - self.mandel_left
+    deltaY = self.mandel_top - self.mandel_bottom
+    
+    deltaSelX = self.r - self.l
+    deltaSelY = self.b - self.t
+    
+    if (self.canvas.width <= self.canvas.height):
+      self.t -= (self.canvas.height / self.canvas.width - 1) * deltaSelY / 2
+      self.b += (self.canvas.height / self.canvas.width - 1) * deltaSelY / 2
+    else:
+      self.l -= (self.canvas.width / self.canvas.height - 1) * deltaSelX / 2
+      self.r += (self.canvas.width / self.canvas.height - 1) * deltaSelX / 2
+    
     self.mandel_left, self.mandel_top, self.mandel_right, self.mandel_bottom = \
-      self.mandel_left + (self.mandel_right - self.mandel_left) * self.l / self.canvas.width, \
-      self.mandel_top - (self.mandel_top - self.mandel_bottom) * self.t / self.canvas.height, \
-      self.mandel_left + (self.mandel_right - self.mandel_left) * self.r / self.canvas.width, \
-      self.mandel_top - (self.mandel_top - self.mandel_bottom) * self.b / self.canvas.height
+      self.mandel_left + deltaX * self.l / self.canvas.width, \
+      self.mandel_top - deltaY * self.t / self.canvas.height, \
+      self.mandel_left + deltaX * self.r / self.canvas.width, \
+      self.mandel_top - deltaY * self.b / self.canvas.height
       
     print(self.mandel_left, self.mandel_top, self.mandel_right, self.mandel_bottom)
   
@@ -174,10 +156,18 @@ class Mandel:
   def place_selector(self, x, y):
     self.action = "select"
     
-    self.l, self.t = max(0, x - 20), max(0, y - 20)
-    self.r, self.b = min(self.canvas.width - 1, x + 20), min(self.canvas.height - 1, y + 20)
+    self.l, self.t = x - 30, y - 30
+    self.r, self.b = x + 30, y + 30
     self.baseX = int(self.r + self.l) / 2
     self.baseY = int(self.b + self.t) / 2
+    
+    deltaX = max(0, -self.l) + min(0, self.canvas.width - self.r)
+    deltaY = max(0, -self.t) + min(0, self.canvas.height - self.b)
+
+    self.l += deltaX
+    self.r += deltaY
+    self.t += deltaY
+    self.b += deltaY
     
     self.selector.style.visibility = "visible"
     self.selector.style.left = "{}px".format(self.l)
@@ -325,17 +315,17 @@ class Mandel:
         self.place_selector(x, y)
     else:
       if (self.action == "select"):
-        if (self.baseX - 5 <= x <= self.baseX + 5 and self.baseY - 5 <= y <= self.baseY + 5):
+        if (self.baseX - 10 <= x <= self.baseX + 10 and self.baseY - 10 <= y <= self.baseY + 10):
           self.action = "moving"
-        elif (self.l <= x <= self.l + 10):
-          if (self.t <= y <= self.t + 10):
+        elif (self.l <= x <= self.l + 20):
+          if (self.t <= y <= self.t + 20):
             self.action = "resize-NW"
-          elif (self.b - 10 <= y <= self.b):
+          elif (self.b - 20 <= y <= self.b):
             self.action = "resize-SW"
-        elif (self.r - 10 <= x <= self.r):
-          if (self.t <= y <= self.t + 10):
+        elif (self.r - 20 <= x <= self.r):
+          if (self.t <= y <= self.t + 20):
             self.action = "resize-NE"
-          elif (self.b - 10 <= y <= self.b):
+          elif (self.b - 20 <= y <= self.b):
             self.action = "resize-SE"
   
   
