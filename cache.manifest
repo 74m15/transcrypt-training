@@ -1,0 +1,8 @@
+CACHE MANIFEST
+
+# v001
+
+CACHE:
+mandel.html
+__javascript__/mandel.js
+__javascript__/sample_worker.js

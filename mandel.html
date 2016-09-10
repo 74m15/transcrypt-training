@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html>
+<html manifest="cache.manifest">
   <head>
     <title>Mandelbrot set</title>
     <style>
@@ -16,6 +16,13 @@
       }
     </style>
     <script src="__javascript__/mandel.js"></script>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Mandelbrot">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="apple-touch-icon" href="mandel.png">
+
   </head>
   <body onload="mandel.mandelbrot.startup(); mandel.mandelbrot.draw();">
     <div id="container">
