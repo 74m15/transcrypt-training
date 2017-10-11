@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html manifest="cache.manifest">
+<!--html manifest="cache.manifest"-->
+<html>
   <head>
     <title>Mandelbrot set</title>
     <style>
-      body, div#container { margin: 0px; }
-
+      body { margin: 0px; }
 
       span#selector {
         background-color: #a0a0a0;
@@ -13,6 +13,15 @@
         border: 1px solid gray;
         position: absolute;
         display: flex;
+      }
+
+      div#container {
+        margin: 0px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 500px;
+        height: 400px;
       }
     </style>
     <script src="__javascript__/mandel.js"></script>
@@ -22,38 +31,10 @@
     <meta name="apple-mobile-web-app-title" content="Mandelbrot">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <link rel="apple-touch-icon" href="mandel.png">
-
   </head>
   <body onload="mandel.mandelbrot.startup(); mandel.mandelbrot.draw();">
     <div id="container">
-      <table>
-        <tr>
-          <td rowspan="2">
-            <canvas id="mandelbrot" width="600" height="600"/>
-          </td>
-          <td>
-            <h1>Mandelbrot set</h1>
-            <h2>Transcrypt training</h2>
-          </td>
-        </tr>
-        <tr>
-          <td valign="top">
-            <p>Width <input type="text" value="300" id="txt_width"/></p>
-            <p>Max iter <input type="text" value="128" id="txt_max_iter"/></p>
-            <p>&nbsp;</p>
-            <button onclick="mandel.mandelbrot.draw()">Draw</button>
-            <button onclick="mandel.mandelbrot.reset()">Reset</button>
-            <p>&nbsp;</p>
-            <table width="200px" style="margin: 2px; border: 1px solid blue; background-color: white;">
-              <tr height="20px" align="left">
-                <td style="background-color: white; margin: 0px; width: 1px;"/>
-                <td id="progress-bar" style="background-color: blue; width: 100%; margin: 0px;"/>
-                <td style="background-color: white; margin: 0px;"/>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
+      <canvas id="mandelbrot" width="100%" height="100%"/>
       <span id="selector" style="left: 100px; top: 100px; width: 400px; height: 400px; visibility: hidden;">
         <table width="100%" height="100%" style="border-collapse: collapse; border: 0px solid white;">
           <tr>
@@ -79,6 +60,21 @@
           </tr>
         </table>
       </span>
+    </div>
+    <div id="control">
+      <p>Width <input type="text" value="300" id="txt_width"/></p>
+      <p>Max iter <input type="text" value="128" id="txt_max_iter"/></p>
+      <p>&nbsp;</p>
+      <button onclick="mandel.mandelbrot.draw()">Draw</button>
+      <button onclick="mandel.mandelbrot.reset()">Reset</button>
+      <p>&nbsp;</p>
+      <table width="200px" style="margin: 2px; border: 1px solid blue; background-color: white;">
+        <tr height="20px" align="left">
+          <td style="background-color: white; margin: 0px; width: 1px;"/>
+          <td id="progress-bar" style="background-color: blue; width: 100%; margin: 0px;"/>
+          <td style="background-color: white; margin: 0px;"/>
+        </tr>
+      </table>
     </div>
   </body>
 </html>
